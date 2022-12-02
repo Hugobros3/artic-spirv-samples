@@ -1,15 +1,14 @@
 #[import(cc = "thorin")] fn spirv(_dev: i32, _grid: (i32, i32, i32), _block: (i32, i32, i32), _body: fn() -> ()) -> ();
 
-#[import(cc = "device", name = "debug_printf")] fn shader_printf[T](T) -> ();
-
-fn @(false) foo() {}
+#[import(cc = "device", name = "debug_printf")] fn shady_printf[T](T) -> ();
+#[import(cc = "device", name = "subgroup_local_id")] fn shady_subgroup_local_id() -> i32;
 
 #[export]
-fn main() {
-    spirv(0, (2, 2, 64), (1, 1, 32), || {
-        foo();
-        foo();
-        shader_printf("Hello from the GPU side of things !");
+fn main() -> i32 {
+    spirv(0, (1, 1, 64), (1, 1, 64), || {
+        let id = shady_subgroup_local_id();
+        shady_printf("Hello from the GPU side of things ! %d\n", id);
     });
+    return (69)
 }
 
