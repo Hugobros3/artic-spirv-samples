@@ -1,0 +1,29 @@
+#[import(cc = "thorin")] fn spirv(_dev: i32, _grid: (i32, i32, i32), _block: (i32, i32, i32), _body: fn() -> ()) -> ();
+
+#[import(cc = "device", name = "debug_printf")] fn shady_printf[T](T) -> ();
+#[import(cc = "device", name = "subgroup_local_id")] fn shady_subgroup_local_id() -> i32;
+
+fn foo() {
+    let id = shady_subgroup_local_id();
+    shady_printf("Foo %d\n", id);
+}
+
+fn bar() {
+    let id = shady_subgroup_local_id();
+    shady_printf("Bar %d\n", id);
+}
+
+#[export]
+fn main() -> i32 {
+    spirv(0, (1, 1, 64), (1, 1, 64), || {
+        let id = shady_subgroup_local_id();
+        shady_printf("Thread: %d %d\n", id, id % 2 == 0);
+        if (id % 2 == 0) {
+            foo();
+        } else {
+            bar();
+        }
+    });
+    return (69)
+}
+
